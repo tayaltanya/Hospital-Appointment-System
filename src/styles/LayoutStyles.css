@@ -1,0 +1,135 @@
+/* ROOT LAYOUT */
+.main {
+    padding: 15px;
+    min-height: 100vh;
+    background: #f4f6f8;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.layout {
+    display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 280px;
+    min-height: calc(100vh - 30px);
+    border-radius: 12px;
+    background: linear-gradient(180deg, #3a0202, #1a0101);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+    margin-right: 20px;
+    color: white;
+    padding: 20px 0;
+    transition: width 0.3s ease;
+}
+
+/* LOGO */
+.logo h6 {
+    font-size: 1.6rem;
+    text-align: center;
+    margin: 25px 0;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+/* MENU */
+.menu {
+    margin-top: 40px;
+}
+
+.menu-item {
+    margin: 10px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.menu-item a {
+    display: flex;
+    align-items: center;   /* THIS fixes vertical alignment */
+    gap: 14px;             /* spacing between icon & text */
+    padding: 12px 18px;
+    color: white;
+    text-decoration: none;
+    font-size: 1.1rem;
+    line-height: 1;        /* prevents text from going lower */
+}
+
+.menu-item i {
+    font-size: 1.25rem;
+    line-height: 1;        /* keeps icon centered */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* HOVER */
+.menu-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* ACTIVE ITEM */
+.active {
+    background: white;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.active a,
+.active i {
+    color: #3a0202;
+    font-weight: 600;
+}
+
+/* CONTENT AREA */
+.content {
+    flex: 1;
+}
+
+/* HEADER */
+.header {
+    height: 70px;
+    margin-bottom: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 20px;
+}
+
+/* HEADER CONTENT */
+.header-content {
+    display: flex;
+    align-items: center;
+}
+
+.header-content i {
+    margin-right: 18px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: #555;
+    transition: color 0.3s ease;
+}
+
+.header-content i:hover {
+    color: #3a0202;
+}
+
+.header-content a {
+    text-decoration: none;
+    font-size: 1.1rem;
+    color: #3a0202;
+    font-weight: 500;
+    margin-left: 10px;
+    text-transform: uppercase;
+}
+
+/* BODY */
+.body {
+    min-height: calc(100vh - 130px);
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
