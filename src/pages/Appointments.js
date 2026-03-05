@@ -3,6 +3,8 @@ import axios from "axios";
 import Layout from "../components/Layout";
 import moment from "moment";
 import { Table } from "antd";
+import BannerImage from "../assests/frame-medical-equipment-desk.jpg";
+
 
 const Appointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -63,8 +65,19 @@ const Appointments = () => {
 
   return (
     <Layout>
+      <div
+        className="appoitments"
+        style={{
+          backgroundImage: `url(${BannerImage})`,
+          minHeight: "100vh",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+        >
       <h1>Appoinmtnets Lists</h1>
       <Table columns={columns} dataSource={appointments} />
+      </div>
     </Layout>
   );
 };

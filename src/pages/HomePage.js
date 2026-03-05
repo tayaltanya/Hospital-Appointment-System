@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
+import "../styles/HomePage.css";
 import axios from "axios";
 import Layout from "./../components/Layout";
 import { Row } from "antd";
 import DoctorList from "../components/DoctorList";
+import BannerImage from "../assests/frame-medical-equipment-desk.jpg";
+
 const HomePage = () => {
   const [doctors, setDoctors] = useState([]);
   // login user data
@@ -30,11 +33,15 @@ const HomePage = () => {
   }, []);
   return (
     <Layout>
+     <div className="home" style={{ backgroundImage: `url(${BannerImage})` }}>
+    
       <h1 className="text-center">Home Page</h1>
       <Row>
         {doctors && doctors.map((doctor) => <DoctorList doctor={doctor} />)}
       </Row>
+      </div>
     </Layout>
+    
   );
 };
 

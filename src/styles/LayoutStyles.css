@@ -15,7 +15,7 @@
     width: 280px;
     min-height: calc(100vh - 30px);
     border-radius: 12px;
-    background: linear-gradient(180deg, #3a0202, #1a0101);
+    background: linear-gradient(180deg, #5a2121, hsl(0, 53%, 17%));
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
     margin-right: 20px;
     color: white;
@@ -76,7 +76,7 @@
 
 .active a,
 .active i {
-    color: #3a0202;
+    color: #2b080b;
     font-weight: 600;
 }
 

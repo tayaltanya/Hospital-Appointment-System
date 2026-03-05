@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Layout from "./../../components/Layout";
 import axios from "axios";
 import { message, Table } from "antd";
+import BannerImage from "../../assests/frame-medical-equipment-desk.jpg";
+
 
 const Doctors = () => {
   const [doctors, setDoctors] = useState([]);
@@ -86,8 +88,21 @@ const Doctors = () => {
 
   return (
     <Layout>
+      <div
+  className="doctors"
+  style={{
+    backgroundImage: `url(${BannerImage})`,
+    minHeight: "100vh",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+  }}
+  >
+
+          
       <h1 className="text-center m-3">All Doctors</h1>
       <Table columns={columns} dataSource={doctors} />
+      </div>
     </Layout>
   );
 };

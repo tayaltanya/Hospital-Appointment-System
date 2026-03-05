@@ -1,6 +1,7 @@
 import React from "react";
 import "../styles/LayoutStyles.css";
 import { adminMenu, userMenu } from "./../Data/data";
+//import BannerImage from "../assests/frame-medical-equipment-desk.jpg";
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -44,7 +45,8 @@ const Layout = ({ children }) => {
       ? doctorMenu
       : userMenu;
   return (
-    <>
+    <div>
+    
       <div className="main">
         <div className="layout">
           <div className="sidebar">
@@ -95,7 +97,8 @@ const Layout = ({ children }) => {
           </div>
         </div>
       </div>
-    </>
+    </div>
+    
   );
 };
 

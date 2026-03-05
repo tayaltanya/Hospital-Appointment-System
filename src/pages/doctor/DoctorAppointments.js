@@ -5,6 +5,7 @@ import axios from "axios";
 
 import moment from "moment";
 import { message, Table } from "antd";
+import BannerImage from "../../assests/frame-medical-equipment-desk.jpg";
 
 const DoctorAppointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -95,8 +96,19 @@ const DoctorAppointments = () => {
   ];
   return (
     <Layout>
+      <div
+        className="doctors"
+        style={{
+          backgroundImage: `url(${BannerImage})`,
+          minHeight: "100vh",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+        >
       <h1>Appoinmtnets Lists</h1>
       <Table columns={columns} dataSource={appointments} />
+      </div>
     </Layout>
   );
 };

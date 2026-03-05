@@ -5,6 +5,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { showLoading, hideLoading } from "../redux/features/alertSlice";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import BannerImage from "../assests/frame-medical-equipment-desk.jpg";
+
 
 const NotificationPage = () => {
   const dispatch = useDispatch();
@@ -123,8 +125,19 @@ const NotificationPage = () => {
 
   return (
     <Layout>
+      <div
+              className="appoitments"
+              style={{
+                backgroundImage: `url(${BannerImage})`,
+                minHeight: "100vh",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }}
+              >
       <h4 className="p-3 text-center">Notification Page</h4>
       <Tabs items={items} />
+      </div>
     </Layout>
   );
 };

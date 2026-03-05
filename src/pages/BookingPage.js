@@ -6,6 +6,8 @@ import { DatePicker, message, TimePicker } from "antd";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { showLoading, hideLoading } from "../redux/features/alertSlice";
+import BannerImage from "../assests/frame-medical-equipment-desk.jpg";
+
 
 const BookingPage = () => {
   const { user } = useSelector((state) => state.user);
@@ -100,6 +102,16 @@ const BookingPage = () => {
   }, []);
   return (
     <Layout>
+      <div
+  className="doctors"
+  style={{
+    backgroundImage: `url(${BannerImage})`,
+    minHeight: "100vh",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+  }}
+  >
       <h3>Booking Page</h3>
       <div className="container m-2">
         {doctors && (
@@ -143,6 +155,7 @@ const BookingPage = () => {
             </div>
           </div>
         )}
+      </div>
       </div>
     </Layout>
   );
