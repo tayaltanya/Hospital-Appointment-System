@@ -4,132 +4,152 @@ const jwt = require("jsonwebtoken");
 const doctorModel = require("../models/doctorModel");
 const appointmentModel = require("../models/appointmentModel");
 const moment = require("moment");
-//register callback
+
+
+// ================= REGISTER =================
 const registerController = async (req, res) => {
   try {
     const exisitingUser = await userModel.findOne({ email: req.body.email });
+
     if (exisitingUser) {
-      return res
-        .status(200)
-        .send({ message: "User Already Exist", success: false });
+      return res.status(200).send({
+        success: false,
+        message: "User Already Exist",
+      });
     }
-    const password = req.body.password;
+
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    req.body.password = hashedPassword;
-    const newUser = new userModel(req.body);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+    const newUser = new userModel({
+      ...req.body,
+      password: hashedPassword,
+    });
+
     await newUser.save();
-    res.status(201).send({ message: "Register Sucessfully", success: true });
+
+    res.status(201).send({
+      success: true,
+      message: "Register Successfully",
+    });
   } catch (error) {
-    console.log(error);
     res.status(500).send({
       success: false,
-      message: `Register Controller ${error.message}`,
+      message: error.message,
     });
   }
 };
 
-// login callback
+
+// ================= LOGIN =================
 const loginController = async (req, res) => {
   try {
     const user = await userModel.findOne({ email: req.body.email });
+
     if (!user) {
-      return res
-        .status(200)
-        .send({ message: "user not found", success: false });
+      return res.status(200).send({
+        success: false,
+        message: "User not found",
+      });
     }
+
     const isMatch = await bcrypt.compare(req.body.password, user.password);
+
     if (!isMatch) {
-      return res
-        .status(200)
-        .send({ message: "Invlid EMail or Password", success: false });
+      return res.status(200).send({
+        success: false,
+        message: "Invalid Email or Password",
+      });
     }
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
+
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.status(200).send({
+      success: true,
+      message: "Login Success",
+      token,
     });
-    res.status(200).send({ message: "Login Success", success: true, token });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ message: `Error in Login CTRL ${error.message}` });
+    res.status(500).send({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
+
+// ================= AUTH =================
 const authController = async (req, res) => {
   try {
     const user = await userModel.findById(req.user.id);
-
     user.password = undefined;
-    if (!user) {
-      return res.status(200).send({
-        message: "user not found",
-        success: false,
-      });
-    } else {
-      res.status(200).send({
-        success: true,
-        data: user,
-      });
-    }
+
+    res.status(200).send({
+      success: true,
+      data: user,
+    });
   } catch (error) {
-    console.log(error);
     res.status(500).send({
-      message: "auth error",
       success: false,
-      error,
+      message: "Auth error",
     });
   }
 };
 
-// APpply DOctor CTRL
+
+// ================= APPLY DOCTOR =================
 const applyDoctorController = async (req, res) => {
   try {
-    // create doctor
+    const { aadhar, degree, photo, license } = req.files;
+
+    let timings = [];
+    if (req.body.timings) {
+      timings = JSON.parse(req.body.timings);
+    }
+
     const newDoctor = new doctorModel({
       ...req.body,
+      timings,
+      aadhar: aadhar?.[0]?.filename,
+      degree: degree?.[0]?.filename,
+      photo: photo?.[0]?.filename,
+      license: license?.[0]?.filename,
       status: "pending",
       userId: req.user.id,
     });
 
     await newDoctor.save();
 
-    // find admin
     const adminUser = await userModel.findOne({ isAdmin: true });
 
-    if (!adminUser) {
-      return res.status(404).send({
-        success: false,
-        message: "Admin not found",
-      });
-    }
-
-    // ensure notification array exists
-    adminUser.notification = adminUser.notification || [];
-
-    adminUser.notification.push({
-      type: "apply-doctor-request",
-      message: `${newDoctor.firstName} ${newDoctor.lastName} has applied for a doctor account`,
-      data: {
-        doctorId: newDoctor._id,
-        name: `${newDoctor.firstName} ${newDoctor.lastName}`,
+    if (adminUser) {
+      adminUser.notification.push({
+        type: "apply-doctor-request",
+        message: `${newDoctor.firstName} ${newDoctor.lastName} applied`,
+        data: {
+          doctorId: newDoctor._id,
+        },
         onClickPath: "/admin/doctors",
-      },
-    });
+      });
 
-    await adminUser.save();
+      await adminUser.save();
+    }
 
     res.status(201).send({
       success: true,
-      message: "Doctor Account Applied Successfully",
+      message: "Doctor Applied Successfully",
     });
   } catch (error) {
-    console.log("ApplyDoctor Error 👉", error);
     res.status(500).send({
       success: false,
-      message: "Error while applying for doctor",
+      message: error.message,
     });
   }
 };
-
 //notificationctrl
 // ================= GET ALL NOTIFICATIONS =================
 const getAllnotificationController = async (req, res) => {
@@ -196,112 +216,198 @@ const deleteAllNotificationController = async (req, res) => {
 };
 
 
-//GET ALL DOC
+// ================= GET DOCTORS =================
 const getAllDocotrsController = async (req, res) => {
   try {
     const doctors = await doctorModel.find({ status: "approved" });
+
     res.status(200).send({
       success: true,
-      message: "Docots Lists Fetched Successfully",
       data: doctors,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).send({
       success: false,
-      error,
-      message: "Errro WHile Fetching DOctor",
+      message: "Error fetching doctors",
     });
   }
 };
 
-//BOOK APPOINTMENT
+
+// ================= BOOK APPOINTMENT =================
 const bookeAppointmnetController = async (req, res) => {
   try {
-    req.body.date = moment(req.body.date, "DD-MM-YYYY").toISOString();
-    req.body.time = moment(req.body.time, "HH:mm").toISOString();
-    req.body.status = "pending";
-    const newAppointment = new appointmentModel(req.body);
-    await newAppointment.save();
-    const user = await userModel.findOne({ _id: req.body.doctorInfo.userId });
-    user.notification.push({
-      type: "New-appointment-request",
-      message: `A nEw Appointment Request from ${req.body.userInfo.name}`,
-      onCLickPath: "/user/appointments",
+    const newAppointment = new appointmentModel({
+      ...req.body,
+      date: moment(req.body.date, "DD-MM-YYYY").format("DD-MM-YYYY"),
+      time: moment(req.body.time, "HH:mm").format("HH:mm"),
+      status: "pending",
     });
-    await user.save();
+
+    await newAppointment.save();
+
+    const doctorUser = await userModel.findById(req.body.doctorInfo.userId);
+
+    if (doctorUser) {
+      doctorUser.notification.push({
+        type: "New-appointment-request",
+        message: `New appointment from ${req.body.userInfo.name}`,
+        onClickPath: "/user/appointments",
+      });
+
+      await doctorUser.save();
+    }
+
     res.status(200).send({
       success: true,
-      message: "Appointment Book succesfully",
+      message: "Appointment Booked Successfully",
     });
   } catch (error) {
-    console.log(error);
     res.status(500).send({
       success: false,
-      error,
-      message: "Error While Booking Appointment",
+      message: error.message,
     });
   }
 };
 
-// booking bookingAvailabilityController
+
+// ================= AVAILABILITY CHECK =================
 const bookingAvailabilityController = async (req, res) => {
   try {
-    const date = moment(req.body.date, "DD-MM-YY").toISOString();
-    const fromTime = moment(req.body.time, "HH:mm")
-      .subtract(1, "hours")
-      .toISOString();
-    const toTime = moment(req.body.time, "HH:mm").add(1, "hours").toISOString();
-    const doctorId = req.body.doctorId;
+    const { doctorId, date, time } = req.body;
+
+    const fromTime = moment(time, "HH:mm").subtract(1, "hours").format("HH:mm");
+    const toTime = moment(time, "HH:mm").add(1, "hours").format("HH:mm");
+
     const appointments = await appointmentModel.find({
       doctorId,
       date,
-      time: {
-        $gte: fromTime,
-        $lte: toTime,
-      },
+      time: { $gte: fromTime, $lte: toTime },
     });
+
     if (appointments.length > 0) {
       return res.status(200).send({
-        message: "Appointments not Availibale at this time",
-        success: true,
-      });
-    } else {
-      return res.status(200).send({
-        success: true,
-        message: "Appointments available",
+        success: false,
+        message: "Not Available at this time",
       });
     }
+
+    return res.status(200).send({
+      success: true,
+      message: "Available",
+    });
   } catch (error) {
-    console.log(error);
     res.status(500).send({
       success: false,
-      error,
-      message: "Error In Booking",
+      message: error.message,
     });
   }
 };
 
+
+// ================= USER APPOINTMENTS =================
 const userAppointmentsController = async (req, res) => {
   try {
     const appointments = await appointmentModel.find({
-      userId: req.body.userId,
+      userId: req.user.id,
     });
+
     res.status(200).send({
       success: true,
-      message: "Users Appointments Fetch SUccessfully",
       data: appointments,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).send({
       success: false,
-      error,
-      message: "Error In User Appointments",
+      message: error.message,
     });
   }
 };
 
+
+// ================= NEW: ADD REVIEW =================
+const addReviewController = async (req, res) => {
+  try {
+    const { doctorId, rating, comment } = req.body;
+
+    const doctor = await doctorModel.findById(doctorId);
+
+    doctor.reviews.push({
+      userName: req.user?.name || "User",
+      rating,
+      comment,
+    });
+
+    await doctor.save();
+
+    res.status(200).send({
+      success: true,
+      message: "Review Added",
+    });
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+// ================= NEW: ADD ACHIEVEMENT =================
+const addAchievementController = async (req, res) => {
+  try {
+    const { doctorId, achievement } = req.body;
+
+    const doctor = await doctorModel.findById(doctorId);
+
+    doctor.achievements.push(achievement);
+
+    await doctor.save();
+
+    res.status(200).send({
+      success: true,
+      message: "Achievement Added",
+    });
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+//google 
+const googleLoginController = async (req, res) => {
+  try {
+    const { name, email, googleId } = req.body;
+
+    let user = await userModel.findOne({ email });
+
+    if (!user) {
+      user = await userModel.create({
+        name,
+        email,
+        password: googleId,
+      });
+    }
+
+    const token = JWT.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.status(200).send({
+      success: true,
+      token,
+    });
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+// ================= EXPORT =================
 module.exports = {
   loginController,
   registerController,
@@ -313,4 +419,7 @@ module.exports = {
   bookeAppointmnetController,
   bookingAvailabilityController,
   userAppointmentsController,
+  addReviewController,
+  addAchievementController,
+  googleLoginController,
 };

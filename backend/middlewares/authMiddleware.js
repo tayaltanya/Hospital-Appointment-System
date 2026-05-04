@@ -1,31 +1,36 @@
-const JWT = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
-module.exports = async (req, res, next) => {
+module.exports = (req, res, next) => {
   try {
-    const token = req.headers["authorization"]?.split(" ")[1];
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
+    if (!authHeader) {
       return res.status(401).send({
         success: false,
         message: "No token provided",
       });
     }
 
-    JWT.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      if (err) {
-        return res.status(401).send({
-          success: false,
-          message: "Auth Failed",
-        });
-      } else {
-        // ✅ FIX IS HERE
-        req.user = { id: decoded.id };
-        next();
-      }
-    });
+    const token = authHeader.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).send({
+        success: false,
+        message: "Token missing",
+      });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    //  IMPORTANT FIX
+    req.user = {
+      id: decoded.id,
+    };
+
+    next();
   } catch (error) {
-    console.log(error);
-    res.status(401).send({
+    console.log("AUTH ERROR:", error);
+    return res.status(401).send({
       success: false,
       message: "Auth Failed",
     });

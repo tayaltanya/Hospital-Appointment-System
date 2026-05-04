@@ -5,6 +5,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { showLoading, hideLoading } from "../redux/features/alertSlice";
 import axios from "axios";
+import "../styles/LoginStyles.css";
+
+// 👉 import your image (add in assets folder)
+import loginImage from  "../assests/login.png";
+;
 
 const Login = () => {
   const navigate = useNavigate();
@@ -22,7 +27,7 @@ const Login = () => {
     });
   };
 
-  // submit form
+  // submit form (UNCHANGED)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -38,13 +43,9 @@ const Login = () => {
       if (res.data.success) {
         message.success("Login successful");
 
-        // save token
         localStorage.setItem("token", res.data.token);
+        axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
 
-        // optional: set token for all future axios requests
-        axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
-
-        // redirect
         navigate("/");
       } else {
         message.error(res.data.message);
@@ -59,42 +60,43 @@ const Login = () => {
   };
 
   return (
-    <div className="form-container">
-      <form onSubmit={handleSubmit}>
-        <h1>Login Form</h1>
+    <div className="login-container">
+      
+      {/* LEFT SIDE */}
+      <div className="login-left">
+        <form onSubmit={handleSubmit} className="login-form">
+          <h2>Welcome Back 👋</h2>
+          <p className="subtitle">Login to your account</p>
 
-        <div className="mb-3">
-          <label className="form-label">Email address</label>
           <input
             type="email"
-            className="form-control"
             name="email"
+            placeholder="Enter your email"
             value={formData.email}
             onChange={handleChange}
             required
           />
-        </div>
 
-        <div className="mb-3">
-          <label className="form-label">Password</label>
           <input
             type="password"
-            className="form-control"
             name="password"
+            placeholder="Enter your password"
             value={formData.password}
             onChange={handleChange}
             required
           />
-        </div>
 
-        <Link to="/register" className="m-3">
-          New user? Register
-        </Link>
+          <button type="submit">Login</button>
 
-        <button type="submit" className="btn btn-primary">
-          Login
-        </button>
-      </form>
+          <Link to="/register">New user? Register</Link>
+        </form>
+      </div>
+
+      {/* RIGHT SIDE */}
+      <div className="login-right">
+        <img src={loginImage} alt="login visual" />
+      </div>
+
     </div>
   );
 };

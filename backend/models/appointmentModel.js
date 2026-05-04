@@ -10,15 +10,19 @@ const appointmentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     doctorInfo: {
-      type: String,
+      type: Object,
       required: true,
     },
+
     userInfo: {
-      type: String,
+      type: Object,
       required: true,
     },
-    date: {
+
+    // FIX: single datetime field (MAIN CHANGE)
+   date: {
       type: String,
       required: true,
     },
@@ -35,6 +39,4 @@ const appointmentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const appointmentModel = mongoose.model("appointments", appointmentSchema);
-
-module.exports = appointmentModel;
+module.exports = mongoose.model("appointments", appointmentSchema);
